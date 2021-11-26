@@ -1,6 +1,7 @@
 package com.example.week10;
 
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -76,5 +77,11 @@ public class SearchViewController implements Initializable {
                     }
 
                 });
+    }
+
+    @FXML
+    private void getMovieDetails(ActionEvent event) throws IOException, InterruptedException {
+        String movieId = initialMovieDataListView.getSelectionModel().getSelectedItem().getImdbID();
+        SceneChanger.changeScenes(event, "movie-details-view.fxml", movieId);
     }
 }

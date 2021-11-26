@@ -71,4 +71,23 @@ public class APIUtility {
 
         return apiResponse;
     }
+
+
+    /**
+     * This will call the OMDB api with the specified search term
+     */
+    public static MovieDetails getMovieDetails(String movieID) throws IOException, InterruptedException {
+        movieID = movieID.trim().replace(" ", "%20");
+
+        String uri = "http://www.omdbapi.com/?apikey=4a1010ab&i="+movieID;
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(uri)).build();
+
+        //this approach stores the API response to a String and then creates objects
+        HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        Gson gson = new Gson();
+        return gson.fromJson(response.body(), MovieDetails.class);
+    }
 }
