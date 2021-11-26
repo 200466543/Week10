@@ -34,26 +34,45 @@ public class SearchViewController implements Initializable {
     @FXML
     private void getSearchResults() throws IOException, InterruptedException {
         initialMovieDataListView.getItems().clear();
+
+
         ApiResponse apiResponse = APIUtility.getMoviesFromOMDB(searchTextField.getText());
         if (apiResponse.getSearch() != null)
         {
-            initialMovieDataListView.getItems().addAll(apiResponse.getSearch());
+            initialMovieDataListView.getItems().addAll(apiResponse.getSearchSorted());
+            setMovieFound(true, false);
         } else
         {
-            errMsgLabel.setVisible(true);
+            setMovieFound(false, false);
         }
     }
+
+    /**
+     * This method will turn visual element to be visible or not
+     * visible on the state of the GUI
+     * @param movieFound
+     * @param movieSelected
+     */
+    private void setMovieFound(boolean movieFound, boolean movieSelected) {
+        initialMovieDataListView.setVisible(movieFound);
+        getDetailsButton.setVisible(movieSelected);
+        posterImageView.setVisible(movieSelected);
+        errMsgLabel.setVisible(!movieFound);
+    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         errMsgLabel.setVisible(false);
+        setMovieFound(false, false);
         initialMovieDataListView.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldMovie, movieSelected) -> {
                     try{
                         posterImageView.setImage(new Image(movieSelected.getPoster()));
+                        setMovieFound(true, true);
                     }catch(Exception e)
                     {
-
+                        // add a default poster
                     }
 
                 });
