@@ -35,14 +35,18 @@ public class SearchViewController implements Initializable {
     private void getSearchResults() throws IOException, InterruptedException {
         initialMovieDataListView.getItems().clear();
         ApiResponse apiResponse = APIUtility.getMoviesFromOMDB(searchTextField.getText());
-        if (apiResponse != null)
+        if (apiResponse.getSearch() != null)
         {
             initialMovieDataListView.getItems().addAll(apiResponse.getSearch());
+        } else
+        {
+            errMsgLabel.setVisible(true);
         }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        errMsgLabel.setVisible(false);
         initialMovieDataListView.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldMovie, movieSelected) -> {
                     try{

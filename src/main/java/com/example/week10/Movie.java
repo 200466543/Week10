@@ -2,7 +2,7 @@ package com.example.week10;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Movie {
+public class Movie implements Comparable<Movie>{
     @SerializedName("Title")
     private String title;
     @SerializedName("Year")
@@ -56,5 +56,11 @@ public class Movie {
     public String toString()
     {
         return String.format("%s-%s",title, year);
+    }
+
+
+    @Override
+    public int compareTo(Movie otherMovie) {
+        return this.getTitle().compareTo(otherMovie.getTitle());
     }
 }
