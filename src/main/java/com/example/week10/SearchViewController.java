@@ -1,13 +1,11 @@
 package com.example.week10;
 
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -31,6 +29,9 @@ public class SearchViewController implements Initializable {
 
     @FXML
     private Button getDetailsButton;
+
+    @FXML
+    private ProgressBar progressBar;
 
     @FXML
     private void getSearchResults() throws IOException, InterruptedException {
@@ -66,15 +67,51 @@ public class SearchViewController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         errMsgLabel.setVisible(false);
         setMovieFound(false, false);
+        progressBar.setVisible(false);
+
         initialMovieDataListView.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldMovie, movieSelected) -> {
-                    try{
-                        posterImageView.setImage(new Image(movieSelected.getPoster()));
-                        setMovieFound(true, true);
-                    }catch(Exception e)
-                    {
-                        // add a default poster
-                    }
+                    progressBar.setVisible(true);
+                    Thread fetchPosterThread = new Thread(new Runnable() { // Thread to fetch poster art
+                        @Override
+                        public void run() {
+                            double progress = 0;
+                            for (int i=0; i<=10; i++){
+                                //simulate computer doing work
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                progress += 0.1;
+
+                                //create a final (non-changeable) variable to pass in the progress
+                                //to the JavaFX thread
+                                final double reportedProgress = progress;
+
+                                //this is the JavaFX Thread. the method runLater() will execute
+                                //once the thread is available
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (reportedProgress>.9) {
+                                            progressBar.setVisible(false);
+                                            try{
+                                                //Thread.sleep(5000);
+                                                posterImageView.setImage(new Image(movieSelected.getPoster()));
+                                                setMovieFound(true, true);
+                                            }catch(Exception e)
+                                            {
+                                                // add a default poster
+                                            }
+                                        }
+                                        progressBar.setProgress(reportedProgress);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    fetchPosterThread.start();
 
                 });
     }
